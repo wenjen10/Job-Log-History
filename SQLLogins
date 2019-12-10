@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <table name="kp_SQLLogins">
+    <column name="ServerName" datatype="varchar(50)" />
+    <column name="dtmStamp" datatype="datetime" />
+    <column name="Login_Name" datatype="varchar(500)" />
+    <column name="Is_SysAdmin" datatype="bit" />
+    <column name="Login_Type" datatype="varchar(500)" />
+    <column name="Is_Disabled" datatype="bit" />
+    <column name="Created" datatype="datetime" />
+    <column name="Last_Updated" datatype ="datetime" />
+    <column name="Changed" datatype="varchar(500)" />
+    <column name="GUID" datatype="varchar(50)" />
+  </table>
+  <sql>
+    <![CDATA[
+SELECT @@servername, getdate(),  p.name AS [Login_Name] ,
+		sysadmin as [Is_SysAdmin],
+        p.type_desc as [Login_Type] ,
+        p.is_disabled as [Is_Disabled],
+        p.create_date  AS [Created],
+        p.modify_date  AS [Last_Updated],
+		case 
+			when datediff(d, modify_date,getdate()) < 30 then 'Within 30 Days'
+			when datediff(d, modify_date, getdate()) between 31 and 60 then '30 - 60 Days'
+			else 'Over 60 Days'
+		end as Changed
+FROM    sys.server_principals p
+        JOIN sys.syslogins s ON p.sid = s.sid
+WHERE   p.type_desc IN ('SQL_LOGIN', 'WINDOWS_LOGIN', 'WINDOWS_GROUP')
+        -- Logins that are not process logins
+        AND p.name NOT LIKE '##%'
+order by is_disabled, sysAdmin desc, Type_desc desc, p.name
+    ]]>
+  </sql>
+  
+</root>
