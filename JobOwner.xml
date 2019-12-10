@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <table name="kp_JobOwners">
+    <column name="ServerName" datatype="varchar(50)" />
+    <column name="dtmStamp" datatype="datetime" />
+    <column name="JobName" datatype="varchar(500)" />
+    <column name="OwnerName" datatype="varchar(500)" />
+    <column name="GUID" datatype="varchar(50)" />
+  </table>
+  <sql>
+    <![CDATA[
+SELECT @@SERVERNAME as serverName, getdate() as dtmStamp
+, a.name [JobName], suser_sname(a.owner_sid) [OwnerName]
+From msdb..sysjobs a
+    ]]>
+  </sql>
+
+</root>
