@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <table name="kp_JobHistory">
+    <column name="ServerName" datatype="varchar(50)" />
+    <column name="dtmStamp" datatype="datetime" />
+    <column name="Status" datatype="varchar(50)" />
+    <column name="Job_Name" datatype="varchar(128)" />
+    <column name="Run_Date" datatype="varchar(8)" />
+    <column name="Run_Time" datatype="int" />
+    <column name="Job_Description" datatype="varchar(512)" />
+    <column name="Job_Status_Message" datatype="varchar(1024)" />
+    <column name="GUID" datatype="varchar(50)" />
+
+  </table>
+  <sql>
+    <![CDATA[
+SELECT top 1000 @@SERVERNAME as serverName, getdate() as dtmStamp,
+case run_status
+	when 0 then 'Failed'
+	when 1 then 'Completed'
+	else 'Unknown'
+end as [Status],
+[name] as Job_Name,
+run_date,
+run_time,
+[description] as Job_Description,
+[message] as Job_Status_Message
+from msdb.dbo.sysjobhistory h
+	inner join msdb.dbo.sysjobs j
+		on h.job_id = j.job_id
+where h.step_id = 0
+and run_date > (select max(run_date) from msdb.dbo.sysjobhistory) - 100
+order by run_date desc
+    ]]>
+  </sql>
+
+</root>
