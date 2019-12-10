@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <table name="kp_DatabaseProperties">
+    <column name="ServerName" datatype="varchar(500)" />
+    <column name="dtmStamp" datatype="datetime" />
+    <column name="DBName" datatype="varchar(500)" />
+    <column name="class_desc" datatype="varchar(500)" />
+    <column name="name" datatype="varchar(500)" />
+    <column name="value" datatype ="varchar(5000)" />
+    <column name="GUID" datatype="varchar(50)" />
+  </table>
+  <sql>
+    <![CDATA[
+ exec model.sys.sp_MSforeachdb
+'use [?];
+select @@servername as ServerName, getdate() as dtmStamp, DB_NAME() as DBName, class_desc, name, value
+FROM sys.extended_properties;' 
+    ]]>
+  </sql>
+
+</root>
